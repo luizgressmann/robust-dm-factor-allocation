@@ -1,0 +1,16 @@
+# Proprietary index data
+data/raw/*
+data/processed/*
+
+# Keep documentation files
+!data/raw/README.md
+!data/processed/README.md
+
+# Notebook and Python cache
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# Local environments
+.venv/
+venv/

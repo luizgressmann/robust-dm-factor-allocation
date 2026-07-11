@@ -1,0 +1,7 @@
+series_id	factor	index_name	index_code	parent_index	currency	return_type	frequency	launch_date	first_observation	last_observation	download_date	source_url	backtested_history	notes
+market	market	MSCI World Index	990100	MSCI World	USD	NET	monthly	03/31/1986	12/29/2000	06/30/2026	07/11/2026	https://www-cdn.msci.com/web/msci/index-tools/end-of-day-index-data-search	unknown	
+value	value	MSCI World Enhanced Value Index	105868	MSCI World	USD	NET	monthly	12/08/1997	12/31/1997	06/30/2026	07/11/2026	https://www-cdn.msci.com/web/msci/index-tools/end-of-day-index-data-search	unknown	
+momentum	momentum	MSCI World Momentum Index	703755	MSCI World	USD	NET	monthly	12/11/2013	01/31/1997	06/30/2026	07/11/2026	https://www-cdn.msci.com/web/msci/index-tools/end-of-day-index-data-search	unknown	
+quality	quality	MSCI World Quality Index	702787	MSCI World	USD	NET	monthly	12/18/2012	01/31/1997	06/30/2026	07/11/2026	https://www-cdn.msci.com/web/msci/index-tools/end-of-day-index-data-search	unknown	
+min_volatility	minimum_volatility	MSCI World Minimum Volatility (USD) Index	700491	MSCI World	USD	NET	monthly	04/14/2008	01/31/1997	06/30/2026	07/11/2026	https://www-cdn.msci.com/web/msci/index-tools/end-of-day-index-data-search	unknown	
+size_proxy_equal_weight	size_proxy	MSCI World Equal Weighted Index	129857	MSCI World	USD	NET	monthly	01/22/2008	01/31/1997	06/30/2026	07/11/2026	https://www-cdn.msci.com/web/msci/index-tools/end-of-day-index-data-search	unknown	
