@@ -1,10 +1,14 @@
-# Proprietary index data
+# Licensed index data
 data/raw/*
 data/processed/*
 
 # Keep documentation files
 !data/raw/README.md
 !data/processed/README.md
+
+# Outputs derived from licensed data
+results/**
+!results/README.md
 
 # Notebook and Python cache
 .ipynb_checkpoints/
