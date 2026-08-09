@@ -4,7 +4,7 @@
 
 Monthly index-level data is obtained from the MSCI Index Data Search.
 
-The analysis uses following DM indices:
+The analysis uses the following developed-market indices:
 
 - MSCI World Index
 - MSCI World Enhanced Value Index
@@ -13,16 +13,22 @@ The analysis uses following DM indices:
 - MSCI World Minimum Volatility Index
 - MSCI World Equal Weighted Index
 
-The index series are downloaded constantly using NET retrun-type, monthly frequency and USD currency.
+All series use monthly USD net return index levels.
 
 Raw and processed MSCI data files are excluded from the public repository due to licensing restrictions.
 
-Detailed metadata for eac hseries is stored in
-`data/metadata/index_metadata.csv`.
+Detailed metadata for each series, including launch and download dates, is stored in `data/metadata/index_metadata.csv`.
+
+Some histories begin before the official index launch. These observations are treated as backtested history and are discussed separately from the common live period.
 
 ## Data Processing
 
-The raw index-level files are processed in
-`notebooks/01_data_preparation.ipynb`.
+The raw index-level files are processed in `notebooks/01_data_preparation.ipynb`.
 
-Further infos and the processing pipeline are described as comments within the notebook.
+The notebook creates:
+
+- `data/processed/monthly_index_levels.csv`
+- `data/processed/monthly_returns_full.csv`
+- `data/processed/monthly_returns_common.csv`
+
+The import checks and processing steps are documented in the notebook.
