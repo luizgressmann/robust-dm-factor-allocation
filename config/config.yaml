@@ -1,0 +1,32 @@
+data_file: data/processed/monthly_returns_common.csv
+benchmark: market
+factor_columns:
+  - value
+  - momentum
+  - quality
+  - min_volatility
+  - size_proxy
+lookback_months: 120
+rebalance_frequency_months: 3
+maximum_weight: 0.40
+transaction_cost_bps: 10
+periods_per_year: 12
+bootstrap_block_months: 12
+bootstrap_repetitions: 2000
+random_seed: 7
+robustness:
+  lookback_months:
+    - 60
+    - 120
+  rebalance_frequency_months:
+    - 1
+    - 3
+    - 12
+  maximum_weight:
+    - 0.30
+    - 0.40
+    - 0.50
+  transaction_cost_bps:
+    - 0
+    - 10
+    - 25
