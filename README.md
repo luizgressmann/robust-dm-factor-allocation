@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/luizgressmann/robust-dm-factor-allocation/actions/workflows/ci.yml/badge.svg)](https://github.com/luizgressmann/robust-dm-factor-allocation/actions/workflows/ci.yml)
 
-I built this project to see how different allocation rules behave across developed-market equity factors. The focus is on Value, Momentum and Quality. MSCI World Small Cap adds a direct size sleeve instead of using a broad equal-weighted index as a proxy.
+I built this project to see how different allocation rules behave across developed-market equity factors. The focus is on Value, Momentum, Quality and Small Cap.
 
 The backtest runs month by month and only uses past data. Weights estimated at one month-end are first used in the following month. Turnover costs are deducted at each rebalance.
 
