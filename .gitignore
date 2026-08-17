@@ -1,20 +1,54 @@
-# Licensed index data
-data/raw/*
-data/processed/*
-
-# Keep documentation files
+# Licensed source data and derived datasets
+data/raw/**
+data/processed/**
 !data/raw/README.md
 !data/processed/README.md
 
-# Outputs derived from licensed data
+# Generated results
 results/**
 !results/README.md
 
-# Notebook and Python cache
-.ipynb_checkpoints/
-__pycache__/
-*.pyc
+# Local safety bundles used during repository maintenance
+.safety/
 
-# Local environments
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+
+# Coverage and build output
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Local environments and secrets
 .venv/
 venv/
+env/
+ENV/
+.env
+.env.*
+!.env.example
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local logs
+*.log

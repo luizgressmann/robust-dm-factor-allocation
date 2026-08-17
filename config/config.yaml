@@ -4,13 +4,14 @@ factor_columns:
   - value
   - momentum
   - quality
-  - min_volatility
-  - size_proxy
+  - small_cap
 lookback_months: 120
 rebalance_frequency_months: 3
+lag_months: 1
 maximum_weight: 0.40
 transaction_cost_bps: 10
 periods_per_year: 12
+missing_policy: raise
 bootstrap_block_months: 12
 bootstrap_repetitions: 2000
 random_seed: 7

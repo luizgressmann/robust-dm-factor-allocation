@@ -1,11 +1,11 @@
-# Processed Data
+# Processed data
 
-This directory contains cleaned index levels and calculated monthly return series used in the analysis.
+Notebook 01 writes three local files here:
 
-The processed data is generated from the raw MSCI files by `notebooks/01_data_preparation.ipynb`:
+- `monthly_index_levels.csv`
+- `monthly_returns_full.csv`
+- `monthly_returns_common.csv`
 
-- `monthly_index_levels.csv`: aligned monthly index levels
-- `monthly_returns_full.csv`: monthly returns with each series' available history
-- `monthly_returns_common.csv`: complete common sample used for portfolio comparisons
+The common file puts Value, Momentum, Quality, Small Cap and the MSCI World benchmark on the same complete monthly sample. The other notebooks read this file through the package loader.
 
-Processed datasets derived from MSCI index data are not included in the public repository. See `../../DATA_NOTICE.md`.
+These CSV files are derived from licensed inputs and are ignored by Git. Re-run Notebook 01 after changing a raw workbook or the metadata snapshot.
