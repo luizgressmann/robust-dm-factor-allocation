@@ -5,10 +5,10 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+import numpy as np
+import pandas as pd
 
 from .backtest import BacktestResult, walk_forward_backtest
 from .config import DEFAULT_FACTOR_COLUMNS
