@@ -1,50 +1,198 @@
 # Robust Developed-Market Factor Allocation
 
-[![CI](https://github.com/luizgressmann/robust-dm-factor-allocation/actions/workflows/ci.yml/badge.svg)](https://github.com/luizgressmann/robust-dm-factor-allocation/actions/workflows/ci.yml)
+A historical walk-forward study of risk-based allocation across developed-market equity factor indices.
 
-I built this project to see how different allocation rules behave across developed-market equity factors. The focus is on Value, Momentum, Quality and Small Cap.
+## Research Question
 
-The backtest runs month by month and only uses past data. Weights estimated at one month-end are first used in the following month. Turnover costs are deducted at each rebalance.
+**Do risk-based allocation methods provide a robust improvement over equal weighting when combining developed-market equity factor indices under walk-forward estimation, portfolio constraints and transaction costs?**
 
-The MSCI files are licensed and are not included. A small synthetic example lets the project run without them. Its results stay local.
+Portfolio optimization can improve diversification in theory, but the necessary risk estimates are themselves uncertain. This project studies that trade-off in a small universe of developed-market equity factor indices.
 
-## Factor set
+The main comparison is against a simple equal-weighted portfolio. It tests whether using estimated information about the historical risk structure produces an improvement that remains stable once weights are estimated only from past data and implementation assumptions are varied.
 
-| Sleeve | Index | Role |
-| --- | --- | --- |
-| Value | MSCI World Enhanced Value | Main style factor |
-| Momentum | MSCI World Momentum | Main style factor |
-| Quality | MSCI World Quality | Main style factor |
-| Small Cap | MSCI World Small Cap | Size sleeve |
+This is related to the broader estimation-error problem studied by DeMiguel, Garlappi and Uppal (2009). A more direct motivation comes from Dichtl, Drobetz and Wendt (2021), who compare different ways of combining factor portfolios and find that more sophisticated allocation methods do not reliably outperform an equal-weighted factor portfolio.
 
-MSCI World is used as the benchmark. It is not included in the optimizer.
+## Portfolio Universe
 
-## Portfolio rules
+The allocation universe consists of four long-only MSCI World indices representing value, momentum, quality and size sleeves:
 
-The package compares five long-only portfolios:
+| Sleeve | Index |
+| --- | --- |
+| Value | MSCI World Enhanced Value |
+| Momentum | MSCI World Momentum |
+| Quality | MSCI World Quality |
+| Size | MSCI World Small Cap |
 
-- equal weight
-- inverse volatility
-- sample-covariance minimum variance
-- OAS-shrinkage minimum variance
-- equal risk contribution
+MSCI World is used as a broad-market benchmark and is excluded from the allocation universe.
 
-The main run uses a 120-month window, quarterly rebalancing, a 40% weight cap and 10 basis points of one-way turnover cost. Notebook 04 varies the window, rebalance interval, cap and cost for OAS-GMV only.
+The indices are treated as long-only factor/style sleeves rather than academic long-short factor returns. In particular, MSCI World Small Cap is used as a size sleeve and should not be interpreted as an SMB factor.
 
-## Synthetic example
+The underlying historical index data were obtained from the MSCI End of Day Index Data Search. The source files and MSCI-derived outputs are not included in the public repository.
 
-Run the synthetic example from the repository root:
+## Allocation Strategies
 
-```powershell
+The project compares five long-only allocation strategies under the same constraints and walk-forward schedule. Equal Weight serves as the estimation-free baseline. The remaining methods require estimated risk inputs, while the covariance-aware methods also depend on the estimated relationship between the sleeves.
+
+### Equal Weight
+
+A 1/N allocation that does not require estimated volatility or covariance inputs. It serves as the estimation-free baseline.
+
+### Inverse Volatility
+
+Weights are inversely proportional to estimated standalone volatility. The method uses individual risk estimates but does not use the correlation structure between sleeves.
+
+### Sample GMV
+
+A global minimum-variance portfolio estimated from the historical sample covariance matrix. The approach follows the mean-variance portfolio framework introduced by Markowitz (1952).
+
+### OAS-GMV
+
+The same minimum-variance problem is solved using an Oracle Approximating Shrinkage covariance estimate instead of the raw sample covariance matrix.
+
+The OAS estimator follows Chen et al. (2010) and provides a regularized alternative to the sample covariance estimate.
+
+### Equal Risk Contribution
+
+Weights are chosen so that the four sleeves contribute approximately equally to estimated portfolio variance. The method is based on the Equal Risk Contribution framework discussed by Maillard, Roncalli and Teiletche (2010).
+
+## Walk-Forward Design
+
+Portfolio weights are estimated using only observations available at the end of each estimation period and are first applied to the following month's return.
+
+The timing is therefore:
+
+```text
+returns through month t
+        ↓
+estimate portfolio weights
+        ↓
+apply weights from month t+1
+```
+
+Between rebalances, portfolio weights drift with the underlying index returns.
+
+The main specification uses:
+
+| Parameter | Main specification |
+| --- | ---: |
+| Estimation window | 120 months |
+| Rebalancing | Quarterly |
+| Maximum sleeve weight | 40% |
+| Portfolio constraints | Long-only, fully invested |
+| Transaction cost | 10 bps one-way turnover cost |
+| Implementation lag | 1 month |
+
+Turnover is measured against the drifted pre-trade portfolio rather than against the previous target weights. Transaction costs are deducted when the portfolio is rebalanced.
+
+This is a historical walk-forward study rather than a true live out-of-sample experiment because the index universe and research design were chosen with the historical dataset already available.
+
+## Evaluation
+
+The main portfolio comparison reports:
+
+- annualized return,
+- annualized volatility,
+- Sharpe ratio,
+- Sortino ratio,
+- maximum drawdown,
+- active return,
+- tracking error,
+- information ratio,
+- turnover,
+- transaction-cost drag.
+
+MSCI World is used for the benchmark-relative measures.
+
+The project does not forecast factor returns or attempt to time factors. The portfolio methods differ mainly in how they use historical risk and covariance information to construct the allocation.
+
+## Robustness Analysis
+
+The robustness analysis focuses on OAS-GMV and changes several implementation assumptions.
+
+### Estimation and portfolio settings
+
+| Parameter | Values |
+| --- | --- |
+| Estimation window | 60, 120 months |
+| Rebalancing | Monthly, quarterly, annually |
+| Maximum sleeve weight | 30%, 40%, 50% |
+
+The different specifications are evaluated over a common period so that the comparison is not driven by different starting dates.
+
+### Transaction costs
+
+The main OAS-GMV specification is also tested with:
+
+- 0 bps,
+- 10 bps,
+- 25 bps
+
+of one-way turnover cost.
+
+### Post-launch period
+
+Parts of the Momentum and Quality index histories were backtested by the index provider before their official launch dates. The robustness analysis therefore also reports results for a post-launch evaluation period.
+
+### Bootstrap
+
+A circular block bootstrap with 12-month blocks is used to obtain a rough confidence interval for realized annualized active returns.
+
+The bootstrap resamples the realized active-return series. It does not re-estimate the complete portfolio strategy inside every bootstrap draw, so the interval should be interpreted accordingly.
+
+## Implementation
+
+The project is implemented as a small Python package rather than entirely inside notebooks.
+
+The reusable package code handles:
+
+- data validation and return preparation,
+- covariance estimation,
+- portfolio optimization,
+- walk-forward accounting,
+- performance metrics,
+- bootstrap inference,
+- plotting and result export.
+
+The notebooks are used for the research workflow:
+
+1. `01_data_preparation.ipynb` — import, clean and align the raw index data
+2. `02_exploratory_analysis.ipynb` — inspect sample coverage, return properties and correlations
+3. `03_walk_forward_analysis.ipynb` — compare the five allocation strategies
+4. `04_robustness_analysis.ipynb` — test OAS-GMV sensitivity and bootstrap intervals
+
+Automated tests cover portfolio constraints, timing conventions, performance calculations and the synthetic demonstration pipeline.
+
+## Synthetic Demo
+
+Because the underlying MSCI data are licensed, the repository includes a deterministic synthetic example that runs through the same backtesting code without requiring the original market data.
+
+From the repository root:
+
+```bash
 python -m pip install -e .
 python -m robust_dm_factor_allocation.demo --output-dir results/demo
 ```
 
-The example uses synthetic returns with a fixed seed. It runs the same backtest code, but it is not a performance estimate. It writes two CSV files and two charts to the ignored `results/demo/` folder.
+The demo generates 180 synthetic monthly observations, applies all five portfolio methods and exports example tables and figures.
+
+The synthetic results are only a reproducibility and implementation check. Their strategy rankings and metric values are properties of the generated sample and should not be interpreted as evidence of historical or expected investment performance.
+
+## Running the Empirical Analysis
+
+Place the required MSCI source files in `data/raw/`. The expected filenames and source metadata are documented in the repository.
+
+Install the research dependencies:
+
+```bash
+python -m pip install -e ".[dev,research]"
+python -m jupyter lab
+```
+
+Run the notebooks in numerical order.
 
 ## Tests
 
-```powershell
+```bash
 python -m pip install -e ".[dev]"
 ruff check .
 ruff format --check --exclude notebooks .
@@ -52,46 +200,38 @@ coverage run -m unittest discover -s tests -v
 coverage report --fail-under=85
 ```
 
-CI runs these checks on the minimum and current Python versions. It also checks that committed notebooks have no saved outputs.
+## Scope and Limitations
 
-## Research notebooks
+The project is an empirical study of portfolio construction, not a trading strategy or evidence of investable alpha.
 
-To run the MSCI analysis, place the five workbooks in `data/raw/`. The filenames and snapshot dates are listed in [`data/raw/README.md`](data/raw/README.md).
+The analysis uses a small investment universe and simplified transaction costs. Taxes, fund fees, market impact and detailed implementation constraints are not modeled.
 
-```powershell
-python -m pip install -e ".[dev,research]"
-python -m jupyter lab
-```
+Some underlying index histories predate their official launch dates, and the research design was developed with knowledge of the historical dataset.
 
-Run the notebooks in this order:
+With only four portfolio sleeves and relatively long estimation windows, the project should also not be interpreted as a general test of whether covariance shrinkage is superior to sample covariance estimation. OAS-GMV is included as one regularized portfolio specification within this particular setting.
 
-1. [`01_data_preparation.ipynb`](notebooks/01_data_preparation.ipynb)
-2. [`02_exploratory_analysis.ipynb`](notebooks/02_exploratory_analysis.ipynb)
-3. [`03_walk_forward_analysis.ipynb`](notebooks/03_walk_forward_analysis.ipynb)
-4. [`04_robustness_analysis.ipynb`](notebooks/04_robustness_analysis.ipynb)
+The main question is deliberately narrower: whether additional estimation and optimization produce improvements that are stable enough to justify the additional portfolio complexity in this historical walk-forward setting.
 
-Generated MSCI-based tables and charts stay local and are ignored by Git.
+## Data and License
 
-## Project layout
+The source code is released under the MIT License.
 
-```text
-src/robust_dm_factor_allocation/  package code
-tests/                            unit and integration tests
-notebooks/                        four research notebooks
-config/config.yaml                main assumptions
-data/metadata/                    source and launch-date metadata
-results/README.md                local-output instructions
-docs/methodology.md               formulas and implementation details
-```
+MSCI source data, processed MSCI returns and MSCI-derived empirical outputs are not distributed with the repository and are not covered by the software license.
 
-## Limits
+The public synthetic demo does not use MSCI data.
 
-This is a historical comparison, not a strategy ready to trade. Parts of the Momentum and Quality histories were backtested by the index provider. I also made the project choices after seeing the available data. Costs are simplified, and the analysis leaves out taxes, market impact and practical trading limits.
+## References
 
-See [`DATA_NOTICE.md`](DATA_NOTICE.md) before using MSCI files or sharing derived results.
+Markowitz, H. (1952). *Portfolio Selection.* *The Journal of Finance, 7*(1), 77–91. DOI: 10.1111/j.1540-6261.1952.tb01525.x.
 
-## Author and license
+DeMiguel, V., Garlappi, L. & Uppal, R. (2009). *Optimal Versus Naive Diversification: How Inefficient is the 1/N Portfolio Strategy?* *The Review of Financial Studies, 22*(5), 1915–1953. DOI: 10.1093/rfs/hhm075.
 
-Luiz Gressmann | [GitHub](https://github.com/luizgressmann)
+Dichtl, H., Drobetz, W. & Wendt, V.-S. (2021). *How to build a factor portfolio: Does the allocation strategy matter?* *European Financial Management, 27*(1), 20–58. DOI: 10.1111/eufm.12264.
 
-The code is released under the [MIT License](LICENSE). MSCI data and MSCI-derived results are not covered by that license.
+Chen, Y., Wiesel, A., Eldar, Y. C. & Hero, A. O. (2010). *Shrinkage Algorithms for MMSE Covariance Estimation.* *IEEE Transactions on Signal Processing, 58*(10), 5016–5029. DOI: 10.1109/TSP.2010.2053029.
+
+Maillard, S., Roncalli, T. & Teiletche, J. (2010). *On the Properties of Equally-Weighted Risk Contributions Portfolios.* *The Journal of Portfolio Management, 36*(4), 60–70. DOI: 10.3905/jpm.2010.36.4.060.
+
+## Author
+
+Luiz Gressmann

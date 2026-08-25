@@ -7,7 +7,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 
 from .backtest import BacktestResult, walk_forward_backtest
 from .config import DEFAULT_FACTOR_COLUMNS
@@ -170,18 +171,17 @@ def _plot_wealth(return_table: pd.DataFrame, path: Path) -> None:
             label=DISPLAY_NAMES[method],
         )
     ax.set_yscale("log")
-    ax.set_title("Synthetic walk-forward wealth")
-    ax.set_ylabel("Growth of 1 unit (log scale)")
-    ax.set_xlabel("")
+    ticks = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
+    ax.set_yticks(ticks)
+    ax.yaxis.set_major_formatter(
+        mticker.FuncFormatter(lambda y, _: f"{y:g}")
+    )
+    ax.yaxis.set_minor_formatter(mticker.NullFormatter())
+    ax.set_title("Synthetic walk-forward growth simulation of different strategies")
+    ax.set_ylabel("Cummulative wealth (initial value = 1)")
+    ax.set_xlabel("Date")
     ax.grid(alpha=0.22)
     ax.legend(frameon=False, ncol=2)
-    fig.text(
-        0.01,
-        0.01,
-        "Synthetic returns, 60-month lookback, quarterly rebalance, 40% cap, 10 bp cost.",
-        fontsize=8.5,
-        color="#555555",
-    )
     fig.tight_layout(rect=(0, 0.07, 1, 1))
     fig.savefig(path, dpi=180, bbox_inches="tight")
     plt.close(fig)
@@ -218,13 +218,6 @@ def _plot_cap_sensitivity(robustness: pd.DataFrame, path: Path) -> None:
     ax.set_ylabel("Information ratio")
     ax.set_title("OAS-GMV sensitivity across windows and rebalance schedules")
     ax.grid(axis="y", alpha=0.22)
-    fig.text(
-        0.01,
-        0.01,
-        "Each dot is one synthetic lookback/rebalance specification; bars show medians.",
-        fontsize=8.5,
-        color="#555555",
-    )
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     fig.savefig(path, dpi=180, bbox_inches="tight")
     plt.close(fig)
