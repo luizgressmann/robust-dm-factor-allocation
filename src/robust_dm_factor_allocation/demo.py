@@ -173,9 +173,7 @@ def _plot_wealth(return_table: pd.DataFrame, path: Path) -> None:
     ax.set_yscale("log")
     ticks = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
     ax.set_yticks(ticks)
-    ax.yaxis.set_major_formatter(
-        mticker.FuncFormatter(lambda y, _: f"{y:g}")
-    )
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f"{y:g}"))
     ax.yaxis.set_minor_formatter(mticker.NullFormatter())
     ax.set_title("Synthetic walk-forward growth simulation of different strategies")
     ax.set_ylabel("Cummulative wealth (initial value = 1)")
